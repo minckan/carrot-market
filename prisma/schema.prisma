@@ -1,25 +1,29 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-//schema.prisma는 데이터 베이스에 대한 모든 설명을 담은 파일.
+
+// #Prisma가 schema.prisma 파일을 보는 이유
+// 1) model들을 DB에 push하고 SQL migration을 자동으로 처리하기 위함
+// 2) DB와 상호작용하기 위해 client를 생성하고 그 client에 자동완성으로 타입들을 추가하기 위해.
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"] 
 }
-// referentialIntegrity: 다른 객체에 연결될 때 그 객체가 존재하길 바람을 설정.
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  relationMode = "prisma"
 }
 
-model User{
+
+// 데이터베이스에 사용될 모델
+model User {
   id Int @id @default(autoincrement())
+  name String 
   phone Int? @unique
   email String? @unique
-  name String
-  avatar String?
-  create DateTime @default(now())
-  updated DateTime @updatedAt
+  avater String? 
+  createAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
