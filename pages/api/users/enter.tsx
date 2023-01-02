@@ -1,21 +1,46 @@
+import client from "@libs/server/client";
+import withHandler, { ResponseType } from "@libs/server/withHandler";
 import { NextApiRequest, NextApiResponse } from "next";
-import client from "../../../libs/server/client";
+import twilio from "twilio";
 
-export default async function handelr(
+const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+
+async function handelr(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ResponseType>
 ) {
-  console.log(req.body.email);
-  /* 
-        클라이언트에서 header에 컨텐트타입:어플리케이션/제이슨을 하지 않고 
-        req.body.email 을 했을경우 undefined 출력.
-        why? req.body는 req의 내용의 인코딩을 기준으로 parse(인코딩)되기 때문
-    */
-  if (req.method !== "POST") {
-    res.status(401).end;
+  const { phone, email } = req.body;
+  const user = phone ? { phone: +phone } : email ? { email } : null;
+  if (!user) return res.status(400).json({ ok: false });
+  const payload = Math.floor(100000 + Math.random() * 900000) + "";
+  const token = await client.token.create({
+    data: {
+      payload,
+      user: {
+        connectOrCreate: {
+          where: {
+            ...user,
+          },
+          create: {
+            name: "Anonymous",
+            ...user,
+          },
+        },
+      },
+    },
+  });
+
+  if (phone) {
+    const message = await twilioClient.messages.create({
+      messagingServiceSid: process.env.TWILIO_MSSID,
+      to: process.env.TWILIO_PHONE!,
+      body: `Your login token is ${payload}.`,
+    });
+    console.log(message);
   }
-
-  console.log(req.body);
-
-  res.status(200).end();
+  return res.json({
+    ok: true,
+  });
 }
+
+export default withHandler("POST", handelr);
