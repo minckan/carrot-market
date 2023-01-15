@@ -10,7 +10,7 @@ async function handelr(
   res: NextApiResponse<ResponseType>
 ) {
   const { phone, email } = req.body;
-  const user = phone ? { phone: +phone } : email ? { email } : null;
+  const user = phone ? { phone: + phone } : email ? { email } : null;
   if (!user) return res.status(400).json({ ok: false });
   const payload = Math.floor(100000 + Math.random() * 900000) + "";
   const token = await client.token.create({
@@ -31,12 +31,12 @@ async function handelr(
   });
 
   if (phone) {
-    const message = await twilioClient.messages.create({
-      messagingServiceSid: process.env.TWILIO_MSSID,
-      to: process.env.TWILIO_PHONE!,
-      body: `Your login token is ${payload}.`,
-    });
-    console.log(message);
+    /*  const message = await twilioClient.messages.create({
+       messagingServiceSid: process.env.TWILIO_MSSID,
+       to: process.env.TWILIO_PHONE!,
+       body: `Your login token is ${payload}.`,
+     });
+     console.log(message); */
   }
   return res.json({
     ok: true,

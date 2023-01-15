@@ -10,7 +10,7 @@ export default function withHandler(
   fn: (req: NextApiRequest, res: NextApiResponse) => void
 ) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
-    console.log(req);
+    // console.log(req);
 
     if (req.method !== method) {
       return res.status(405).end();
@@ -18,7 +18,7 @@ export default function withHandler(
     try {
       await fn(req, res);
     } catch (error) {
-      console.log(error);
+      console.log('[withHandler] Error ',error);
       return res.status(500).json({ error });
     }
   };
