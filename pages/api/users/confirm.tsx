@@ -30,7 +30,7 @@ async function handler(
 
 export default withAPISession(
   withHandler({
-    method: "POST",
+    methods: ["POST"],
     handler,
     isPrivate: false,
   })
