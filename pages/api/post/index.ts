@@ -23,6 +23,7 @@ async function handler(
       body: { question },
       session: { user },
     } = req;
+
     const post = await client.post.create({
       data: {
         question,

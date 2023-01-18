@@ -6,24 +6,30 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { Post } from "@prisma/client";
 
-interface UploadPostForm {
+interface WriteForm {
   question: string;
+}
+
+interface WriteResponse {
+  ok: boolean;
+  post: Post;
 }
 
 const Write: NextPage = () => {
   const router = useRouter();
-  const { register, handleSubmit } = useForm<UploadPostForm>();
+  const { register, handleSubmit } = useForm<WriteForm>();
 
-  const [uploadPost, { loading, data }] = useMutation("/api/communities");
+  const [post, { loading, data }] = useMutation<WriteResponse>("/api/post");
 
-  const onValid = (data: UploadPostForm) => {
+  const onValid = (data: WriteForm) => {
     if (loading) return;
-    uploadPost(data);
+    post(data);
   };
 
   useEffect(() => {
-    if (data?.ok) {
+    if (data && data?.ok) {
       router.push(`/community/${data.post.id}`);
     }
   }, [data]);
@@ -34,9 +40,9 @@ const Write: NextPage = () => {
         <TextArea
           required
           placeholder="Ask a question!"
-          register={register("question", { required: true })}
+          register={register("question", { required: true, minLength: 5 })}
         />
-        <Button text="Submit" />
+        <Button text={loading ? "Loading..." : "Submit"} />
       </form>
     </Layout>
   );

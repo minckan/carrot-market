@@ -4,6 +4,7 @@ import FloatingButton from "@components/floating-button";
 import Layout from "@components/layout";
 import { Post, User } from "@prisma/client";
 import useSWR from "swr";
+import { useRouter } from "next/router";
 
 interface PostWithUser extends Post {
   user: User;
@@ -14,8 +15,10 @@ interface PostResponse {
 }
 
 const Community: NextPage = () => {
-  const { data } = useSWR<PostResponse>("/api/communities");
-  console.log(data);
+  const router = useRouter();
+  const { data } = useSWR<PostResponse>(
+    router.query.id ? `/api/post/${router.query.id}` : null
+  );
 
   return (
     <Layout hasTabBar title="동네생활">
