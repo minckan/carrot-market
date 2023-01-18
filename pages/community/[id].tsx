@@ -1,8 +1,17 @@
 import type { NextPage } from "next";
 import Layout from "@components/layout";
 import TextArea from "@components/textarea";
+import useSWR from "swr";
+import { useRouter } from "next/router";
 
 const CommunityPostDetail: NextPage = () => {
+  const router = useRouter();
+  const { data } = useSWR(
+    router.query.id ? `/api/communities/${router.query.id}` : null
+  );
+
+  console.log(data);
+
   return (
     <Layout canGoBack>
       <div>
@@ -75,11 +84,11 @@ const CommunityPostDetail: NextPage = () => {
           </div>
         </div>
         <div className="px-4">
-          {/* <TextArea
+          <TextArea
             name="description"
             placeholder="Answer this question!"
             required
-          /> */}
+          />
           <button className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none ">
             Reply
           </button>

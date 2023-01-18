@@ -12,7 +12,6 @@ interface ProductsResponse {
 }
 
 const Home: NextPage = () => {
-  const { user, isLoading } = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
   console.log("[Home] data:", data);
 
@@ -25,8 +24,8 @@ const Home: NextPage = () => {
             key={product.id}
             title={product.name}
             price={product.price}
-            comments={1}
-            hearts={1}
+            // comments={1}
+            hearts={product._count.favs}
           />
         ))}
         <FloatingButton href="/products/upload">

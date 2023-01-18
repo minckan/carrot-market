@@ -8,31 +8,24 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "GET") {
-    const products = await client.prodcut.findMany({
+    const posts = await client.post.findMany({
       include: {
-        _count: {
-          select: {
-            favs: true,
-          },
-        },
+        user: true,
       },
     });
     res.json({
       ok: true,
-      products,
+      post: posts,
     });
   }
   if (req.method === "POST") {
     const {
-      body: { name, price, description },
+      body: { question },
       session: { user },
     } = req;
-    const product = await client.prodcut.create({
+    const post = await client.post.create({
       data: {
-        name,
-        price: +price,
-        description,
-        image: ".jpg",
+        question,
         user: {
           connect: {
             id: user?.id,
@@ -40,9 +33,10 @@ async function handler(
         },
       },
     });
+
     res.json({
       ok: true,
-      product,
+      post,
     });
   }
 }
