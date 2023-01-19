@@ -9,6 +9,7 @@ async function handler(
 ) {
   const {
     query: { id },
+    body: { answer },
     session: { user },
   } = req;
 
@@ -16,29 +17,35 @@ async function handler(
     where: {
       id: +id.toString(),
     },
-    include: {
+    select: {
+      id: true,
+    },
+  });
+  if (!post) {
+    res.status(404).end();
+  }
+  const newAnswer = await client.answer.create({
+    data: {
       user: {
-        select: {
-          id: true,
-          name: true,
-          avater: true,
+        connect: {
+          id: user?.id,
         },
       },
-      _count: {
-        select: {
-          answers: true,
-          wondering: true,
+      post: {
+        connect: {
+          id: +id.toString(),
         },
       },
+      answer: answer,
     },
   });
 
-  res.json({ ok: true, post });
+  res.json({ ok: true, answer: newAnswer });
 }
 
 export default withAPISession(
   withHandler({
-    methods: ["GET"],
+    methods: ["POST"],
     handler: handler,
   })
 );

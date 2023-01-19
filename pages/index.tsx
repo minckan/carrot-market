@@ -4,14 +4,21 @@ import Item from "@components/item";
 import Layout from "@components/layout";
 import useUser from "@libs/client/useUser";
 import useSWR from "swr";
-import { Prodcut } from "@prisma/client";
+import { Fav, Prodcut } from "@prisma/client";
+import products from "./api/products";
 
+interface ProductWithFavorite extends Prodcut {
+  _count: {
+    favs: number;
+  };
+}
 interface ProductsResponse {
   ok: boolean;
-  products: Prodcut[];
+  products: ProductWithFavorite[];
 }
 
 const Home: NextPage = () => {
+  const user = useUser();
   const { data } = useSWR<ProductsResponse>("/api/products");
   console.log("[Home] data:", data);
 

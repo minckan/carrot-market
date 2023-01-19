@@ -5,19 +5,26 @@ import Layout from "@components/layout";
 import { Post, User } from "@prisma/client";
 import useSWR from "swr";
 import { useRouter } from "next/router";
+import useCoords from "@libs/client/useCoords";
 
 interface PostWithUser extends Post {
   user: User;
+  _count: { answers: number; wondering: number };
 }
 interface PostResponse {
   ok: boolean;
   post: PostWithUser[];
 }
-
+// 37.506543 127.031391 - 0.01
+// 37.506543 127.031391 + 0.01
 const Community: NextPage = () => {
-  const router = useRouter();
+  const { latitude, longitude } = useCoords();
+  // Nextjs 와 create-react-app의 차이점.
+  // 페이지가 초기 상태값으로 pre-generate됨.
   const { data } = useSWR<PostResponse>(
-    router.query.id ? `/api/post/${router.query.id}` : null
+    latitude && longitude
+      ? `/api/post?latitude=${latitude}&longitude=${longitude}`
+      : null
   );
 
   return (
@@ -35,7 +42,7 @@ const Community: NextPage = () => {
               </div>
               <div className="mt-5 px-4 flex items-center justify-between w-full text-gray-500 font-medium text-xs">
                 <span>{post.user.name}</span>
-                <span>18시간 전</span>
+                <span>{post.createAt}</span>
               </div>
               <div className="flex px-4 space-x-5 mt-3 text-gray-700 py-2.5 border-t   w-full">
                 <span className="flex space-x-2 items-center text-sm">
@@ -53,7 +60,7 @@ const Community: NextPage = () => {
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     ></path>
                   </svg>
-                  <span>궁금해요 {}</span>
+                  <span>궁금해요 {post._count.wondering}</span>
                 </span>
                 <span className="flex space-x-2 items-center text-sm">
                   <svg
@@ -70,7 +77,7 @@ const Community: NextPage = () => {
                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     ></path>
                   </svg>
-                  <span>답변 {}</span>
+                  <span>답변 {post._count.answers}</span>
                 </span>
               </div>
             </a>
